@@ -16,8 +16,6 @@ disrepair in ordinary photographs of houses.** If it works, a city could survey
 an entire neighbourhood from imagery it already has, and direct repair money to
 the blocks that need it most.
 
-The end product is not the software. It is an estimate a housing department can
-act on.
 
 ---
 
