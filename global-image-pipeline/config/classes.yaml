@@ -1,0 +1,268 @@
+# ============================================================================
+# Global Image Scraping - Class Taxonomy & Search Configuration
+# Project: Building Local Housing Policy Infrastructure (NGA Pilot)
+# Dataset: Model 1 - Global (scraped) training set
+#
+# Class names below MUST match Roboflow class names EXACTLY.
+# ============================================================================
+
+project:
+  name: "housing-repair-need-detection"
+  dataset: "global"
+  batch_tag: "global"          # Step 3: applied to the entire upload batch
+  target_per_class: 160        # doc says ~150-170
+  min_per_class: 150           # below this -> flagged in the tally report
+  max_per_class: 170
+
+# Global image standards (Step 1 "skip images that" / "do keep")
+standards:
+  min_width: 400
+  min_height: 300
+  min_megapixels: 0.15
+  max_aspect_ratio: 3.0        # reject extreme panoramas/banners
+  min_aspect_ratio: 0.4
+  phash_hamming_threshold: 6   # <= this distance == near-duplicate
+  reject_grayscale: false
+  # Filename/URL substrings that usually indicate watermarked stock imagery
+  stock_domain_blocklist:
+    - shutterstock
+    - istockphoto
+    - gettyimages
+    - dreamstime
+    - alamy
+    - 123rf
+    - depositphotos
+    - adobestock
+    - stock.adobe
+    - vecteezy
+    - freepik
+    - bigstockphoto
+    - canstockphoto
+    - stockphoto
+    - watermark
+    # CDN hostnames the brand names above miss: stock agencies serve images
+    # from domains that do not contain the agency name.
+    - ftcdn.net              # Adobe Stock
+    - stockcake
+    - shutterstock.com
+    - stockvault
+    - can-stock
+    - imagesbazaar
+    - photodune
+  # Substrings that usually indicate renovation-in-progress or before/after
+  context_blocklist:
+    - before-and-after
+    - before_after
+    - beforeafter
+    - renovation
+    - remodel
+    - under-construction
+    - underconstruction
+    - new-construction
+    - newconstruction
+    - install
+    - contractor
+    - diy-
+    - how-to
+    - infographic
+    - diagram
+    - clipart
+    - vector
+
+classes:
+
+  - id: 1
+    name: exterior_wall_damage
+    definition: >-
+      Damage to the vertical exterior wall envelope of the house: missing or
+      detached siding, missing/spalled bricks, failed or missing mortar
+      (tuckpointing needed), rotted wood cladding, holes or breaches in stucco.
+    keywords:
+      - "missing siding house"
+      - "damaged vinyl siding home exterior"
+      - "house with siding blown off"
+      - "damaged brick wall house"
+      - "house needs tuckpointing"
+      - "crumbling mortar brick house"
+      - "deteriorated brick facade home"
+      - "missing bricks house wall"
+      - "spalling brick house exterior"
+      - "rotted wood siding house"
+      - "warped buckled siding home exterior"
+      - "stucco damage house exterior"
+      - "house exterior wall deterioration"
+      - "storm damaged siding house"
+      - "cracked mortar joints house wall"
+      - "clapboard siding damage old house"
+      - "abandoned house siding falling off"
+      - "blighted home exterior wall"
+      - "condemned house wall damage"
+      - "derelict house brickwork crumbling"
+      - "vacant property siding damage"
+      - "hurricane damaged house siding"
+      - "tornado damaged home exterior wall"
+      - "old farmhouse siding deteriorating"
+
+  - id: 2
+    name: window_damage
+    definition: >-
+      A window opening that is boarded over (plywood/OSB/metal) or has broken,
+      shattered, cracked, or missing glazing. Includes windows sealed with
+      board-up material on an otherwise occupied house.
+    keywords:
+      - "boarded up window house"
+      - "broken window house exterior"
+      - "plywood covered window home"
+      - "boarded up house windows exterior"
+      - "shattered window home exterior"
+      - "vacant house boarded windows"
+      - "broken glass window residential house"
+      - "abandoned house broken windows"
+      - "window plywood board residential home"
+      - "cracked window pane house exterior"
+      - "boarded up front window home"
+      - "smashed window house front"
+      - "abandoned house window boarded plywood"
+      - "derelict house broken windows exterior"
+      - "condemned property boarded windows"
+      - "blighted house windows boarded up"
+      - "vacant home broken window street"
+      - "squatter house boarded windows"
+      - "foreclosed home boarded up windows"
+      - "urban blight boarded windows house"
+      - "burned house broken windows exterior"
+      - "old abandoned farmhouse broken window"
+      - "detroit abandoned house windows"
+      - "riot damage boarded shop window house"
+
+  - id: 3
+    name: roof_hole
+    definition: >-
+      An actual opening/puncture through the roof plane exposing the interior,
+      decking, or sky. Distinct from missing_shingles (surface layer only) and
+      sagging_roof (deflection without breach).
+    keywords:
+      - "hole in roof house"
+      - "roof damage hole exterior"
+      - "collapsed roof section house"
+      - "roof caved in house"
+      - "hole in shingle roof home"
+      - "storm damage hole roof house"
+      - "tree fell through roof house"
+      - "roof opening damage residential"
+      - "punctured roof house exterior"
+      - "roof breach damage home"
+      - "abandoned house roof collapsed"
+      - "derelict building roof hole exterior"
+      - "storm ripped roof open house"
+      - "hurricane roof damage house exterior"
+      - "tornado destroyed roof home"
+      - "condemned house roof caved"
+
+  - id: 4
+    name: facade_peeling_paint
+    definition: >-
+      Paint or applied coating on the exterior that is peeling, flaking,
+      blistering, or chipping away from the substrate. The substrate itself is
+      still present (otherwise it is exterior_wall_damage).
+    keywords:
+      - "peeling paint house exterior"
+      - "house facade paint damage"
+      - "flaking paint house siding"
+      - "chipped paint home exterior"
+      - "weathered peeling paint house"
+      - "blistering paint house exterior"
+      - "old house peeling paint wall"
+      - "paint peeling wood siding home"
+      - "faded peeling paint house front"
+      - "exterior paint failure house"
+      - "abandoned house peeling paint exterior"
+      - "derelict home paint peeling walls"
+      - "old wooden house paint peeling porch"
+      - "blighted house peeling paint"
+      - "neglected house exterior paint peeling"
+      - "weatherboard house paint failing"
+      - "paint coming off house siding"
+
+  - id: 5
+    name: missing_shingles
+    definition: >-
+      Roofing shingles/tiles absent from the roof surface, exposing underlayment
+      or decking, but with no through-hole and no structural deflection.
+    keywords:
+      - "missing shingles roof"
+      - "roof shingles damage house"
+      - "shingles blown off roof house"
+      - "missing asphalt shingles home"
+      - "wind damage shingles roof house"
+      - "bald spots roof shingles home"
+      - "roof missing shingles exterior house"
+      - "curled missing shingles roof house"
+      - "storm damaged shingle roof house"
+      - "roof shingles torn off home"
+      - "hurricane shingle damage house roof"
+      - "tornado roof shingles missing home"
+      - "hail damage roof shingles house"
+      - "abandoned house missing shingles"
+      - "derelict roof shingles missing exterior"
+      - "windstorm roof damage house shingles"
+      - "roof missing tiles old house exterior"
+      - "house roof shingles peeling off"
+      - "damaged roof tiles house exterior"
+      - "slate roof missing tiles house"
+      - "roof shingle loss residential exterior"
+      - "weathered roof missing shingles home"
+      - "storm torn roof house neighborhood"
+      - "insurance claim roof shingle damage house"
+
+  - id: 6
+    name: sagging_roof
+    definition: >-
+      Visible deflection of the roof plane or ridge line - swayback, dip,
+      bowing, or partial structural collapse - indicating framing failure.
+    keywords:
+      - "sagging roof house"
+      - "roof structural damage house"
+      - "swaybacked roof old house"
+      - "sagging ridge line roof home"
+      - "collapsing roof house exterior"
+      - "deflected roof house structure"
+      - "dilapidated house sagging roof"
+      - "roof sagging residential home"
+      - "bowed roof line old house"
+      - "abandoned barn sagging roof"
+      - "derelict house roof sagging exterior"
+      - "old farmhouse sagging roofline"
+      - "condemned house sagging roof structure"
+      - "collapsing abandoned house roof"
+      - "neglected house roof dipping ridge"
+      - "sagging roof abandoned farmhouse"
+      - "old house roof sway back"
+      - "roof ridge sagging exterior house"
+      - "dilapidated barn roof sagging"
+      - "roof line uneven old house exterior"
+      - "structural roof failure house exterior"
+      - "buckled roof house exterior"
+      - "roof deflection old home exterior"
+
+  - id: 7
+    name: no_repair
+    definition: >-
+      A single-family home in sound exterior condition with no visible defect
+      from any of the six damage classes. NEGATIVE CLASS - receives no bounding
+      box in Roboflow (uploaded as a null/background example).
+    keywords:
+      - "single family home exterior"
+      - "well maintained house exterior"
+      - "suburban house front view"
+      - "ranch style house exterior"
+      - "two story house exterior front"
+      - "colonial house exterior front"
+      - "craftsman bungalow exterior"
+      - "brick house exterior front"
+      - "vinyl siding house exterior"
+      - "cape cod house exterior"
+      - "split level house exterior"
+      - "residential home street view"
+      - "modest house exterior front yard"
+      - "small house exterior curb view"

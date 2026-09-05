@@ -1,0 +1,22 @@
+# Image data — collected locally, never committed.  The global set is ~1.2 GB
+# and its licensing varies by source; Roboflow is the system of record for it.
+dataset/
+quarantine/
+overflow/
+archive_no_provenance/
+images/
+
+# Credentials
+.env
+.env.*
+*.pem
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Logs and OS cruft
+*.log
+.DS_Store

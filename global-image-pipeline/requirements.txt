@@ -1,0 +1,11 @@
+# Core (required by every script)
+pyyaml>=6.0
+pillow>=10.0
+numpy>=1.24
+
+# Image sources for 01_collect.py
+icrawler>=0.6.9        # Google + Bing image search backends (no API key)
+requests>=2.31         # Openverse + Wikimedia Commons backends
+
+# Step 3 upload / Step 5 annotated counts
+roboflow>=1.1.30
