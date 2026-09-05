@@ -1,0 +1,8 @@
+class,collected,target,gap_to_target,quarantined,annotated,status
+exterior_wall_damage,170,160,0,401,,OK
+window_damage,170,160,0,487,,OK
+roof_hole,153,160,7,256,,OK
+facade_peeling_paint,167,160,0,240,,OK
+missing_shingles,170,160,0,371,,OK
+sagging_roof,170,160,0,333,,OK
+no_repair,170,160,0,170,,OK
