@@ -6,21 +6,20 @@ upload → annotate → track.
 
 ## Status
 
-1,170 images collected and uploaded on 2026-09-05 as a single batch tagged
-`global`. Roboflow holds 1,110 after its own server-side de-duplication.
+1,148 images collected and uploaded, tagged `global`. Annotation not started.
 
 | class | images |
 |---|---|
-| exterior_wall_damage | 170 |
-| window_damage | 170 |
-| roof_hole | 153 |
-| facade_peeling_paint | 167 |
 | missing_shingles | 170 |
-| sagging_roof | 170 |
 | no_repair | 170 |
-| **total** | **1,170** |
+| window_damage | 168 |
+| exterior_wall_damage | 166 |
+| facade_peeling_paint | 164 |
+| sagging_roof | 158 |
+| roof_hole | 152 |
+| **total** | **1,148** |
 
-All classes meet the 150 minimum. Annotation (Step 4) has not started.
+All classes are at or above the 150 minimum.
 
 ## Relationship to `collect images/`
 

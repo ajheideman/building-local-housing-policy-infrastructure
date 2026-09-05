@@ -75,54 +75,65 @@ def hamming(a: int, b: int) -> int:
 # --------------------------------------------------------------------------
 def looks_like_collage(path: Path) -> bool:
     """
-    Detect staged before/after composites (two photos butted together).
+    Detect staged composites: two or more photos butted together in a strip.
 
-    Tuned for PRECISION, not recall.  Measured on a fixture set: it catches
-    composites that carry a visible divider bar, and misses roughly half of the
-    seamless ones -- two photos butted together with no border share sky along
-    the top and ground along the bottom, so the seam genuinely carries little
-    signal.  That is accepted deliberately: a false positive silently deletes a
-    good image, while a miss is still caught by the URL/query keyword filter
-    (STAGED) and by the `review-staged` tag during annotation.  Measured false
-    positive rate on normal house photos, including wide frames with a hard
-    vertical edge at dead centre: 0%.
+    What actually separates a composite from a normal photograph is not the
+    presence of a strong vertical edge -- houses are full of those -- but a
+    DIVIDER BAR: a near-uniform, bright strip running the full height of the
+    image.  An architectural edge (a brick pier between a window and a door)
+    has varied content down its length; a divider bar does not.
 
-    All three tests below must agree before an image is rejected.
+    Measured on the fixture set, at 1024px wide with aspect preserved, taking
+    the least-varying column within +/-10px of each candidate seam:
+
+        sample                     min std   mean
+        4-panel roofing composite      0.9   252.9
+        4-panel defect infographic     0.6-8.4  222-255
+        photo, smashed windows        35.3    80.1
+        photo, burned-out house       33.0   120.8
+        photo, sound house            54.7   156.2
+        photo, damaged wall           46.0   121.1
+
+    An earlier version tested only a centre-column contrast jump and rejected
+    the smashed-windows photo above, whose window/door pier sits at dead
+    centre.  Uniformity plus brightness is what actually discriminates.
+
+    Still misses seamless composites with no divider, which is accepted: those
+    are caught by the STAGED URL filter and by review at annotation time.
     """
     try:
         with Image.open(path) as im:
             w, h = im.size
             if h == 0 or w / h < 1.35:
                 return False          # composites are essentially always wide
-            arr = np.asarray(im.convert("RGB").resize((256, 256), Image.LANCZOS),
-                             dtype=np.float32)
+            # 1024 wide, aspect preserved: a 1-2px divider in a 3456px source
+            # survives the resize instead of blurring away.
+            tw = 1024
+            th = max(64, int(round(1024 * h / w)))
+            gray = np.asarray(im.convert("RGB").resize((tw, th), Image.LANCZOS),
+                              dtype=np.float32).mean(axis=2)
     except Exception:
         return False
 
-    gray = arr.mean(axis=2)
-    c = 128
-
-    # 1. a jump present in almost EVERY row within a narrow central band
-    #    (a band, not a single column, so a solid divider bar still registers)
-    band = gray[:, c - 8:c + 9]
-    if band.shape[1] < 3:
-        return False
-    row_jump = np.abs(np.diff(band, axis=1)).max(axis=1)
-    if float((row_jump > 25).mean()) < 0.90:
+    n = gray.shape[1]
+    if th < 32:
         return False
 
-    # 2. that jump must stand out against the rest of the image
-    col_diff = np.abs(np.diff(gray, axis=1)).mean(axis=0)
-    if float(np.abs(np.diff(band, axis=1)).mean()) < float(np.median(col_diff)) * 6:
-        return False
+    def has_divider(centre: int) -> bool:
+        lo, hi = max(0, centre - 10), min(n, centre + 11)
+        if hi - lo < 3:
+            return False
+        best = min(float(gray[:, x].std()) for x in range(lo, hi))
+        # pick the column that achieved it, to test its brightness
+        col = min(range(lo, hi), key=lambda x: float(gray[:, x].std()))
+        return best < 15.0 and float(gray[:, col].mean()) > 200.0
 
-    # 3. the two halves must genuinely be different scenes
-    left, right = arr[:, :c], arr[:, c:]
-    hl = np.histogram(left, bins=24, range=(0, 255))[0].astype(np.float32)
-    hr = np.histogram(right, bins=24, range=(0, 255))[0].astype(np.float32)
-    hl /= hl.sum() + 1e-6
-    hr /= hr.sum() + 1e-6
-    return float(np.abs(hl - hr).sum()) > 0.45
+    # 2-, 3- and 4-panel layouts.  EVERY interior seam of a layout must carry a
+    # divider before the image is rejected.
+    for panels in (2, 3, 4):
+        if all(has_divider(round(n * k / panels)) for k in range(1, panels)):
+            return True
+    return False
 
 
 def looks_like_illustration(path: Path) -> bool:
